@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimplePub - Простой способ публиковать</title>
+    <style>
+        :root {
+            --bg-color: #fff;
+            --text-color: #333;
+            --accent-color: #2d9cdb;
+            --secondary-color: #e0e0e0;
+            --border-color: #eaeaea;
+            --placeholder-color: #888;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #f5f5f5;
+            --accent-color: #3498db;
+            --secondary-color: #333;
+            --border-color: #444;
+            --placeholder-color: #aaa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 24px;
+            padding: 5px;
+        }
+
+        main {
+            padding: 40px 0;
+        }
+
+        .editor-title {
+            width: 100%;
+            font-size: 36px;
+            font-weight: bold;
+            border: none;
+            outline: none;
+            margin-bottom: 30px;
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .editor-title::placeholder {
+            color: var(--placeholder-color);
+        }
+
+        .editor-content {
+            width: 100%;
+            min-height: 60vh;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            resize: none;
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .editor-content::placeholder {
+            color: var(--placeholder-color);
+        }
+
+        .toolbar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .publish-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .publish-btn:hover {
+            background-color: #2380b1;
+        }
+
+        .format-tools {
+            display: flex;
+            gap: 15px;
+        }
+
+        .format-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .articles {
+            margin-top: 30px;
+        }
+
+        .article-item {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .article-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .article-preview {
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            color: var(--placeholder-color);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .editor-title {
+                font-size: 28px;
+            }
+            
+            .editor-content {
+                font-size: 16px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #viewPage {
+            padding: 40px 0;
+        }
+
+        #viewTitle {
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        #viewContent {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .snackbar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .snackbar.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="#" class="logo" id="homeLogo">SimplePub</a>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </header>
+
+        <main>
+            <div id="editorPage">
+                <input type="text" class="editor-title" id="titleInput" placeholder="Заголовок вашей статьи" maxlength="100">
+                <textarea class="editor-content" id="contentInput" placeholder="Расскажите свою историю..."></textarea>
+                
+                <div class="toolbar">
+                    <div class="format-tools">
+                        <button class="format-btn" data-format="bold">B</button>
+                        <button class="format-btn" data-format="italic"><i>I</i></button>
+                        <button class="format-btn" data-format="heading">H</button>
+                        <button class="format-btn" data-format="link">🔗</button>
+                    </div>
+                    <button class="publish-btn" id="publishBtn">Опубликовать</button>
+                </div>
+                
+                <div class="articles" id="articlesList">
+                    <!-- Здесь будут отображаться созданные статьи -->
+                </div>
+            </div>
+
+            <div id="viewPage" class="hidden">
+                <h1 id="viewTitle"></h1>
+                <div id="viewContent"></div>
+            </div>
+        </main>
+
+        <footer>
+            <p>SimplePub © 2025 - Аналог Telegraph</p>
+        </footer>
+    </div>
+
+    <div class="snackbar" id="snackbar"></div>
+
+    <script>
+        // Основные элементы DOM
+        const themeToggle = document.getElementById('themeToggle');
+        const titleInput = document.getElementById('titleInput');
+        const contentInput = document.getElementById('contentInput');
+        const publishBtn = document.getElementById('publishBtn');
+        const articlesList = document.getElementById('articlesList');
+        const formatBtns = document.querySelectorAll('.format-btn');
+        const editorPage = document.getElementById('editorPage');
+        const viewPage = document.getElementById('viewPage');
+        const viewTitle = document.getElementById('viewTitle');
+        const viewContent = document.getElementById('viewContent');
+        const homeLogo = document.getElementById('homeLogo');
+        const snackbar = document.getElementById('snackbar');
+
+        // Проверка и установка темы
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // Переключение темы
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Загрузка статей из локального хранилища
+        function loadArticles() {
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+            articlesList.innerHTML = '';
+            
+            articles.forEach((article, index) => {
+                const preview = article.content.substring(0, 100) + (article.content.length > 100 ? '...' : '');
+                
+                const articleElement = document.createElement('div');
+                articleElement.className = 'article-item';
+                articleElement.innerHTML = `
+                    <h3 class="article-title">${article.title || 'Без заголовка'}</h3>
+                    <p class="article-preview">${preview}</p>
+                `;
+                
+                articleElement.addEventListener('click', () => viewArticle(index));
+                articlesList.appendChild(articleElement);
+            });
+        }
+
+        // Сохранение статьи
+        function saveArticle() {
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            
+            if (!content) {
+                showSnackbar('Пожалуйста, добавьте контент');
+                return;
+            }
+            
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+            const id = Date.now().toString(36) + Math.random().toString(36).substring(2);
+            
+            articles.push({
+                id,
+                title: title || 'Без заголовка',
+                content,
+                date: new Date().toISOString()
+            });
+            
+            localStorage.setItem('articles', JSON.stringify(articles));
+            
+            titleInput.value = '';
+            contentInput.value = '';
+            
+            showSnackbar('Статья опубликована');
+            loadArticles();
+            
+            // Возвращаем уникальную ссылку на статью
+            return `${window.location.origin}${window.location.pathname}?id=${id}`;
+        }
+
+        // Просмотр статьи
+        function viewArticle(index) {
+            const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+            const article = articles[index];
+            
+            if (!article) return;
+            
+            viewTitle.textContent = article.title;
+            viewContent.innerHTML = formatContent(article.content);
+            
+            editorPage.classList.add('hidden');
+            viewPage.classList.remove('hidden');
+            
+            // Обновляем URL
+            history.pushState({articleId: article.id}, article.title, `?id=${article.id}`);
+        }
+
+        // Форматирование контента (простая конвертация переносов строк в <p>)
+        function formatContent(content) {
+            if (!content) return '';
+            
+            // Разбиваем текст на параграфы
+            return content.split('\n\n')
+                .filter(para => para.trim())
+                .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+                .join('');
+        }
+
+        // Возврат к списку статей
+        function goHome() {
+            editorPage.classList.remove('hidden');
+            viewPage.classList.add('hidden');
+            history.pushState({}, 'SimplePub', window.location.pathname);
+        }
+
+        // Показать уведомление
+        function showSnackbar(message) {
+            snackbar.textContent = message;
+            snackbar.classList.add('show');
+            
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+            }, 3000);
+        }
+
+        // Форматирование текста
+        function formatText(format) {
+            const textarea = contentInput;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selection = textarea.value.substring(start, end);
+            
+            let formattedText = '';
+            let cursorOffset = 0;
+            
+            switch (format) {
+                case 'bold':
+                    formattedText = `**${selection}**`;
+                    cursorOffset = 2;
+                    break;
+                case 'italic':
+                    formattedText = `*${selection}*`;
+                    cursorOffset = 1;
+                    break;
+                case 'heading':
+                    formattedText = `# ${selection}`;
+                    cursorOffset = 2;
+                    break;
+                case 'link':
+                    const url = prompt('Введите URL:', 'https://');
+                    if (url) {
+                        formattedText = `[${selection || 'ссылка'}](${url})`;
+                        cursorOffset = 1;
+                    } else {
+                        return;
+                    }
+                    break;
+            }
+            
+            if (formattedText) {
+                textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+                textarea.focus();
+                
+                if (selection) {
+                    // Если был выделен текст, ставим курсор после вставки
+                    textarea.selectionStart = textarea.selectionEnd = start + formattedText.length;
+                } else {
+                    // Если текст не был выделен, ставим курсор внутри тегов
+                    textarea.selectionStart = textarea.selectionEnd = start + cursorOffset;
+                }
+            }
+        }
+
+        // Проверка URL параметров при загрузке
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');
+            
+            if (articleId) {
+                const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+                const articleIndex = articles.findIndex(a => a.id === articleId);
+                
+                if (articleIndex !== -1) {
+                    viewArticle(articleIndex);
+                }
+            }
+        }
+
+        // Инициализация приложения
+        function init() {
+            initTheme();
+            loadArticles();
+            checkUrlParams();
+            
+            // Обработчики событий
+            themeToggle.addEventListener('click', toggleTheme);
+            publishBtn.addEventListener('click', saveArticle);
+            homeLogo.addEventListener('click', (e) => {
+                e.preventDefault();
+                goHome();
+            });
+            
+            formatBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    formatText(btn.getAttribute('data-format'));
+                });
+            });
+            
+            // Обработка навигации браузера
+            window.addEventListener('popstate', event => {
+                if (event.state && event.state.articleId) {
+                    const articles = JSON.parse(localStorage.getItem('articles') || '[]');
+                    const articleIndex = articles.findIndex(a => a.id === event.state.articleId);
+                    
+                    if (articleIndex !== -1) {
+                        viewArticle(articleIndex);
+                    }
+                } else {
+                    goHome();
+                }
+            });
+        }
+
+        // Запуск приложения
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
