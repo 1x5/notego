@@ -8,13 +8,13 @@ services:
     ports:
       - "3100:3000"
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DB_USER=cm804gz6c000u9mpmae
-      - DB_HOST=db
-      - DB_NAME=cm8048va00t0i9mpm8b0
-      - DB_PASSWORD=telegraphpass123
-      - DB_PORT=5432
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - DB_USER=${DB_USER}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
     depends_on:
       - db
     volumes:
