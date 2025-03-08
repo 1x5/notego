@@ -10,10 +10,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DB_USER=${DB_USER}
+      - DB_USER=cm80dsv950015i9mpm20pa4fnt
       - DB_HOST=db
-      - DB_NAME=${DB_NAME}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=cm80dsv970017i9mpm0mwrf89d
+      - DB_PASSWORD=cXlND3kcIYXDJMudmUf6mwYm
       - DB_PORT=5432
     depends_on:
       - db
@@ -24,12 +24,12 @@ services:
     pull_policy: if_not_present
   
   db:
-    # Возвращаемся к PostgreSQL, но с явными значениями
+    # Использование PostgreSQL из GitHub Container Registry
     image: ghcr.io/cloudnative-pg/postgresql:14
     restart: always
     environment:
       - POSTGRES_USER=cm80dsv950015i9mpm20pa4fnt
-      - POSTGRES_PASSWORD=cXlND3kctYXDJMudmUf6rmWYm
+      - POSTGRES_PASSWORD=cXlND3kcIYXDJMudmUf6mwYm
       - POSTGRES_DB=cm80dsv970017i9mpm0mwrf89d
       # Явное указание метода аутентификации
       - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
