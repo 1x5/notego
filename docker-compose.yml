@@ -8,35 +8,37 @@ services:
     ports:
       - "3100:3000"
     environment:
-      - NODE_ENV=${NODE_ENV}
-      - PORT=${PORT}
+      - NODE_ENV=production
+      - PORT=3000
       - DB_USER=${DB_USER}
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=db
       - DB_NAME=${DB_NAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_PORT=${DB_PORT}
+      - DB_PORT=5432
     depends_on:
       - db
     volumes:
       - ./logs:/app/logs
     networks:
       - telegraph-network
-
+    pull_policy: if_not_present
+  
   db:
-    image: postgres:14-alpine
+    # Использование альтернативного источника для образа PostgreSQL
+    image: quay.io/bitnami/postgresql:14
     restart: always
     environment:
-      - POSTGRES_USER=cm804gz6c000u9mpmae
-      - POSTGRES_PASSWORD=telegraphpass123
-      - POSTGRES_DB=cm8048va00t0i9mpm8b0
+      - POSTGRESQL_USERNAME=${DB_USER}
+      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
+      - POSTGRESQL_DATABASE=${DB_NAME}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/bitnami/postgresql
     networks:
       - telegraph-network
+    pull_policy: if_not_present
 
 networks:
   telegraph-network:
     driver: bridge
-
 volumes:
   postgres_data:
