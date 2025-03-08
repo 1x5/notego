@@ -1,5 +1,4 @@
-# Используем альтернативный источник образа Node.js
-FROM quay.io/nodejs/node:16-alpine
+FROM docker.io/library/node:16-alpine
 
 WORKDIR /app
 
