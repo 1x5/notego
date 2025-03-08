@@ -24,18 +24,17 @@ services:
     pull_policy: if_not_present
   
   db:
-    # Используем Bitnami PostgreSQL образ (не требует Docker Hub)
-    image: bitnami/postgresql:14
+    # Возвращаемся к PostgreSQL, но с явными значениями
+    image: ghcr.io/cloudnative-pg/postgresql:14
     restart: always
     environment:
-      # Явно указываем имя пользователя, пароль и базу данных
-      - POSTGRESQL_USERNAME=${DB_USER}
-      - POSTGRESQL_PASSWORD=${DB_PASSWORD}
-      - POSTGRESQL_DATABASE=${DB_NAME}
-      # Добавляем пароль суперпользователя
-      - POSTGRESQL_POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=cm80dsv950015i9mpm20pa4fnt
+      - POSTGRES_PASSWORD=cXlND3kctYXDJMudmUf6rmWYm
+      - POSTGRES_DB=cm80dsv970017i9mpm0mwrf89d
+      # Явное указание метода аутентификации
+      - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
     volumes:
-      - postgres_data:/bitnami/postgresql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - telegraph-network
     pull_policy: if_not_present
