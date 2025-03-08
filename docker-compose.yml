@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   app:
     build:
@@ -11,10 +10,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DB_USER=telegraph_user
+      - DB_USER=cm804gz6c000u9mpmae
       - DB_HOST=db
-      - DB_NAME=telegraph_db
-      - DB_PASSWORD=your_secure_password
+      - DB_NAME=cm8048va00t0i9mpm8b0
+      - DB_PASSWORD=telegraphpass123
       - DB_PORT=5432
     depends_on:
       - db
@@ -27,9 +26,9 @@ services:
     image: postgres:14-alpine
     restart: always
     environment:
-      - POSTGRES_USER=telegraph_user
-      - POSTGRES_PASSWORD=your_secure_password
-      - POSTGRES_DB=telegraph_db
+      - POSTGRES_USER=cm804gz6c000u9mpmae
+      - POSTGRES_PASSWORD=telegraphpass123
+      - POSTGRES_DB=cm8048va00t0i9mpm8b0
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
