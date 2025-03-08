@@ -1,4 +1,4 @@
-FROM docker.io/library/node:16-alpine
+FROM mcr.microsoft.com/devcontainers/javascript-node:0-16
 
 WORKDIR /app
 
