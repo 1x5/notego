@@ -24,23 +24,32 @@ services:
     pull_policy: if_not_present
   
   db:
-    # Использование PostgreSQL из GitHub Container Registry
-    image: ghcr.io/cloudnative-pg/postgresql:14
+    # Используем стабильный образ PostgreSQL из Docker Hub
+    image: postgres:14-alpine
     restart: always
     environment:
       - POSTGRES_USER=cm80dsv950015i9mpm20pa4fnt
       - POSTGRES_PASSWORD=cXlND3kcIYXDJMudmUf6mwYm
       - POSTGRES_DB=cm80dsv970017i9mpm0mwrf89d
-      # Явное указание метода аутентификации
-      - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
+      # Включаем режим доверенной аутентификации для отладки
+      - POSTGRES_HOST_AUTH_METHOD=md5
+      # Дополнительные настройки для стабильности
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - telegraph-network
     pull_policy: if_not_present
+    # Дополнительные параметры для стабильной работы
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cm80dsv950015i9mpm20pa4fnt -d cm80dsv970017i9mpm0mwrf89d"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   telegraph-network:
     driver: bridge
+
 volumes:
   postgres_data:
