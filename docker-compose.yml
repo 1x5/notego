@@ -24,8 +24,8 @@ services:
     pull_policy: if_not_present
   
   db:
-    # Используем docker.io с явным указанием + Alpine для уменьшения размера
-    image: docker.io/library/postgres:14-alpine
+    # Используем Postgres из альтернативного источника
+    image: ghcr.io/cloudnative-pg/postgresql:14
     restart: always
     environment:
       - POSTGRES_USER=${DB_USER}
