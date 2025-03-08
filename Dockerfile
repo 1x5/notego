@@ -1,32 +1,21 @@
-FROM node:18-alpine as build
+FROM mcr.microsoft.com/devcontainers/javascript-node:0-16
 
 WORKDIR /app
 
-# Копируем package.json и package-lock.json
+# Копируем файлы package.json и package-lock.json
 COPY package*.json ./
 
 # Устанавливаем зависимости
-RUN npm install --production
+RUN npm install
 
-# Копируем исходный код
+# Копируем исходный код приложения
 COPY . .
 
-# Создаем оптимизированную сборку
+# Если приложение требует сборки (например, TypeScript)
 RUN npm run build
 
-# Финальный образ
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Копируем зависимости и сборку из предыдущего этапа
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/public ./public
-
-# Экспонируем порт
+# Открываем порт, который будет использоваться приложением
 EXPOSE 3000
 
-# Запускаем приложение
-CMD ["node", "dist/server.js"]
+# Команда для запуска приложения
+CMD ["npm", "start"]
