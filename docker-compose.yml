@@ -21,26 +21,37 @@ services:
       - ./logs:/app/logs
     networks:
       - telegraph-network
+      - coolify  # Используем существующую сеть coolify
     pull_policy: if_not_present
+    labels:
+      - "traefik.enable=true"
+      # Настройка HTTPS маршрута
+      - "traefik.http.routers.notego.rule=Host(`notego.code1x5.ru`)"
+      - "traefik.http.routers.notego.entrypoints=websecure"
+      - "traefik.http.routers.notego.tls=true"
+      - "traefik.http.services.notego.loadbalancer.server.port=3000"
+      # Настройка HTTP маршрута с перенаправлением на HTTPS
+      - "traefik.http.routers.notego-http.rule=Host(`notego.code1x5.ru`)"
+      - "traefik.http.routers.notego-http.entrypoints=web"
+      - "traefik.http.routers.notego-http.middlewares=notego-redirect"
+      - "traefik.http.middlewares.notego-redirect.redirectscheme.scheme=https"
+      # Указание сети
+      - "traefik.docker.network=coolify"
   
   db:
-    # Используем стабильный образ PostgreSQL из Docker Hub
     image: postgres:14-alpine
     restart: always
     environment:
       - POSTGRES_USER=cm80dsv950015i9mpm20pa4fnt
       - POSTGRES_PASSWORD=cXlND3kcIYXDJMudmUf6mwYm
       - POSTGRES_DB=cm80dsv970017i9mpm0mwrf89d
-      # Включаем режим доверенной аутентификации для отладки
       - POSTGRES_HOST_AUTH_METHOD=md5
-      # Дополнительные настройки для стабильности
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - telegraph-network
     pull_policy: if_not_present
-    # Дополнительные параметры для стабильной работы
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U cm80dsv950015i9mpm20pa4fnt -d cm80dsv970017i9mpm0mwrf89d"]
       interval: 10s
@@ -50,6 +61,8 @@ services:
 networks:
   telegraph-network:
     driver: bridge
+  coolify:
+    external: true  # Указываем, что это внешняя сеть
 
 volumes:
   postgres_data:
